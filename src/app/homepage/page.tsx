@@ -9,7 +9,34 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { GraduationCap, School, CalendarDays, FileSearch, BookOpen, Headphones, Landmark, CheckCircle2, ChevronRight, MessageCircle, Phone } from "lucide-react";
+import { SignIn } from "@clerk/nextjs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
+export default function StudentPortalHomepage() {
+  const [appId, setAppId] = useState("");
+  const [status, setStatus] = useState<string | null>(null);
+  const [role, setRole] = useState("applicant");
+
+  const handleCheckStatus = async () => {
+    if (!appId.trim()) return setStatus("Please enter an Application ID");
+    setStatus("Checking...");
+    setTimeout(() => {
+      setStatus(appId === "12345" ? "✅ Accepted" : "⏳ Under Review");
+    }, 600);
+  };
 /**
  * NEXT STEPS (images):
  * Put your real school images in /public/images and keep the same names used below,
@@ -34,27 +61,19 @@ import { GraduationCap, School, CalendarDays, FileSearch, BookOpen, Headphones, 
  * - /public/images/event-2.jpg         (notice/event 2)
  * - /public/images/event-3.jpg         (notice/event 3)
  */
-
-export default function StudentPortalHomepage() {
-  const [appId, setAppId] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
-
-  const handleCheckStatus = async () => {
-    // ⚠️ Integrate your real API here
-    if (!appId.trim()) return setStatus("Please enter an Application ID");
-    setStatus("Checking...");
-    setTimeout(() => {
-      setStatus(appId === "12345" ? "✅ Accepted" : "⏳ Under Review");
-    }, 600);
-  };
-
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* NAVBAR */}
       <nav className="sticky top-0 z-40 bg-whitebeacon /80 backdrop-blur border-b">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <School className="h-6 w-6 text-indigo-600" />
+            <Image
+              src="/images/logo.png"
+              alt="School Logo"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
             <span className="font-bold text-lg">Beacon House School</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -63,9 +82,7 @@ export default function StudentPortalHomepage() {
             <a href="#portfolio" className="hover:text-indigo-600">Success</a>
             <a href="#admission" className="hover:text-indigo-600">Admissions</a>
             <a href="#events" className="hover:text-indigo-600">Events</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">Login</Button>
+
             <Button size="sm">Apply Now</Button>
           </div>
         </div>
@@ -173,7 +190,7 @@ export default function StudentPortalHomepage() {
                   <CardTitle>{p.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <Button size="sm" className="w-full">Apply Now</Button>
+                  <Button size="sm" className="w-full">View Roadmap</Button>
                 </CardContent>
               </Card>
             ))}
@@ -258,7 +275,10 @@ export default function StudentPortalHomepage() {
             <p className="text-white/90 mt-1">Find out if you qualify in under 60 seconds.</p>
           </div>
           <div className="flex md:justify-end gap-3">
-            <Button variant="secondary">Start Quiz</Button>
+            <Button className="bg-white text-indigo-600 hover:bg-white/90">
+              View Criteria
+            </Button>
+            <Button className="bg-white text-indigo-600 hover:bg-white/90">Start Quiz</Button>
             <Button className="bg-white text-indigo-600 hover:bg-white/90">Download Guide</Button>
           </div>
         </div>
