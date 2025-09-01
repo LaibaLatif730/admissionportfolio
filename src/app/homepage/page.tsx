@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { GraduationCap, School, CalendarDays, FileSearch, BookOpen, Headphones, Landmark, CheckCircle2, ChevronRight, MessageCircle, Phone } from "lucide-react";
-import { SignIn } from "@clerk/nextjs";
+import {
+  GraduationCap,
+  School,
+  CalendarDays,
+  FileSearch,
+  BookOpen,
+  Headphones,
+  Landmark,
+  CheckCircle2,
+  ChevronRight,
+  MessageCircle,
+  Phone,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,10 +36,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// ✅ Supabase imports
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
+
 export default function StudentPortalHomepage() {
   const [appId, setAppId] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [role, setRole] = useState("applicant");
+
+  const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const handleCheckStatus = async () => {
     if (!appId.trim()) return setStatus("Please enter an Application ID");
@@ -37,30 +55,40 @@ export default function StudentPortalHomepage() {
       setStatus(appId === "12345" ? "✅ Accepted" : "⏳ Under Review");
     }, 600);
   };
-/**
- * NEXT STEPS (images):
- * Put your real school images in /public/images and keep the same names used below,
- * or change the "src" values to your own file names/URLs.
- * - /public/images/hero.jpg            (campus or students hero)
- * - /public/images/stats-1.jpg         (classroom)
- * - /public/images/stats-2.jpg         (graduation)
- * - /public/images/stats-3.jpg         (partners/event)
- * - /public/images/stats-4.jpg         (admission desk)
- * - /public/images/prog-it.jpg         (IT Lab)
- * - /public/images/prog-biz.jpg        (Business class)
- * - /public/images/prog-arts.jpg       (Arts studio)
- * - /public/images/prog-eng.jpg        (Engineering workshop)
- * - /public/images/roadmap-1.jpg       (admission)
- * - /public/images/roadmap-2.jpg       (orientation)
- * - /public/images/roadmap-3.jpg       (graduation)
- * - /public/images/roadmap-4.jpg       (career)
- * - /public/images/testimonial-1.jpg   (alumni 1)
- * - /public/images/testimonial-2.jpg   (alumni 2)
- * - /public/images/testimonial-3.jpg   (alumni 3)
- * - /public/images/event-1.jpg         (notice/event 1)
- * - /public/images/event-2.jpg         (notice/event 2)
- * - /public/images/event-3.jpg         (notice/event 3)
- */
+
+  // ✅ Handle redirect after login
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const userRole = session.user.user_metadata.role || "student";
+
+        if (userRole === "superadmin") {
+          router.push("/superadmin/dashboard");
+        } else if (userRole === "admin") {
+          router.push("/admin/dashboard");
+        }else if (userRole === "subadmin1") {
+          router.push("/subadmin1/dashboard");
+        }else if (userRole === "subadmin2") {
+          router.push("/subadmin2/dashboard");
+        }else {
+          router.push("/applicant/dashboard");
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase, router]);
+
+  // ✅ Login with Supabase (Google OAuth)
+  const handleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+    if (error) console.error("Login Error:", error.message);
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* NAVBAR */}
@@ -77,63 +105,80 @@ export default function StudentPortalHomepage() {
             <span className="font-bold text-lg">Beacon House School</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <a href="#programs" className="hover:text-indigo-600">Programs</a>
-            <a href="#roadmap" className="hover:text-indigo-600">Journey</a>
-            <a href="#portfolio" className="hover:text-indigo-600">Success</a>
-            <a href="#admission" className="hover:text-indigo-600">Admissions</a>
-            <a href="#events" className="hover:text-indigo-600">Events</a>
+            <a href="#programs" className="hover:text-indigo-600">
+              Programs
+            </a>
+            <a href="#roadmap" className="hover:text-indigo-600">
+              Journey
+            </a>
+            <a href="#portfolio" className="hover:text-indigo-600">
+              Success
+            </a>
+            <a href="#admission" className="hover:text-indigo-600">
+              Admissions
+            </a>
+            <a href="#events" className="hover:text-indigo-600">
+              Events
+            </a>
 
-            <Button size="sm">Apply Now</Button>
+            {/* ✅ Supabase Login */}
+            <Button size="sm" onClick={handleLogin}>
+              Sign In
+            </Button>
           </div>
         </div>
       </nav>
 
       {/* HERO with IMAGE BACKGROUND */}
       <section className="bg-white">
-  <div className="mx-auto max-w-7xl px-4 py-24 md:py-32">
-    <div className="flex flex-col md:flex-row items-center gap-12">
-      {/* Left side: Text Content */}
-      <div className="md:w-1/2">
-        <h1 className="text-4xl md:text-6xl font-extrabold leading-tight max-w-3xl">
-          Transform Your School Into a Digital‑First Institution
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg/7 text-gray-600">
-          Showcase real success, simplify admissions, and guide every student from application to career—on one platform.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          {/* Ensure you have a valid Button component here */}
-          {/* <Button size="lg" className="shadow">Check Eligibility</Button>
-          <Button size="lg" variant="secondary">Explore Programs</Button> */}
-        </div>
-      </div>
-      {/* Right side: Image */}
-      <div className="relative md:w-1/2 h-80 md:h-[400px] w-full mt-8 md:mt-0">
-        <Image
-          src="/images/hero.jpg"
-          alt="Hero Image"
-          fill
-          priority
-          className="object-cover rounded-lg shadow-lg"
-        />
-      </div>
-      </div>
-
+        <div className="mx-auto max-w-7xl px-4 py-24 md:py-32">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            {/* Left side: Text Content */}
+            <div className="md:w-1/2">
+              <h1 className="text-4xl md:text-6xl font-extrabold leading-tight max-w-3xl">
+                Transform Your School Into a Digital-First Institution
+              </h1>
+              <p className="mt-4 max-w-2xl text-lg/7 text-gray-600">
+                Showcase real success, simplify admissions, and guide every
+                student from application to career—on one platform.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3"></div>
+            </div>
+            {/* Right side: Image */}
+            <div className="relative md:w-1/2 h-80 md:h-[400px] w-full mt-8 md:mt-0">
+              <Image
+                src="/images/hero.jpg"
+                alt="Hero Image"
+                fill
+                priority
+                className="object-cover rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
 
           {/* Inline status checker */}
-          <div id="admission" className="mt-10 w-full max-w-lg rounded-2xl bg-white/95 p-4 text-gray-900 shadow-lg">
+          <div
+            id="admission"
+            className="mt-10 w-full max-w-lg rounded-2xl bg-white/95 p-4 text-gray-900 shadow-lg"
+          >
             <div className="flex items-center gap-3 mb-2">
               <FileSearch className="h-5 w-5 text-indigo-600" />
               <h3 className="font-semibold">Admission Status</h3>
             </div>
             <div className="flex gap-2">
-              <Input placeholder="Enter Application ID (e.g., 12345)" value={appId} onChange={(e)=>setAppId(e.target.value)} />
+              <Input
+                placeholder="Enter Application ID (e.g., 12345)"
+                value={appId}
+                onChange={(e) => setAppId(e.target.value)}
+              />
               <Button onClick={handleCheckStatus}>Check</Button>
             </div>
-            {status && <p className="mt-2 text-sm font-medium">Status: {status}</p>}
+            {status && (
+              <p className="mt-2 text-sm font-medium">Status: {status}</p>
+            )}
           </div>
         </div>
       </section>
-
       {/* TRUST STATS — IMAGE TILES */}
       <section className="mx-auto max-w-7xl px-4 py-14">
         <h2 className="text-center text-3xl md:text-4xl font-extrabold">Trusted by Students, Backed by Results</h2>
