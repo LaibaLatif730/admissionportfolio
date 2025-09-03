@@ -60,27 +60,30 @@ export default function ProgramsPage() {
 
   return (
     <main className="p-8 space-y-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-blue-700 flex items-center gap-2">
-            📘 Programs & Courses
-          </h1>
-          <p className="mt-1 text-gray-600 text-sm md:text-base">
-            Add, edit, and manage all academic programs/courses. Assign eligibility criteria.
-          </p>
-        </div>
+      {/* Header/Navbar */}
+<header className="w-full bg-white dark:bg-neutral-900 shadow-md rounded-xl px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  {/* Left Section - Title + Subtitle */}
+  <div>
+    <h1 className="text-2xl md:text-3xl font-extrabold text-blue-700 flex items-center gap-2">
+      Programs & Courses
+    </h1>
+    <p className="mt-1 text-gray-600 dark:text-gray-300 text-sm md:text-base">
+      Add, edit, and manage all academic programs/courses. Assign eligibility criteria.
+    </p>
+  </div>
 
-        <Button
-          className="bg-blue-500 text-white hover:bg-blue-600"
-          onClick={() => {
-            setEditProgram(null);
-            setModalOpen(true);
-          }}
-        >
-          + Add New Program
-        </Button>
-      </header>
+  {/* Right Section - Button */}
+  <Button
+    className="bg-blue-500 text-white hover:bg-blue-600 px-5 py-2 rounded-lg shadow-sm"
+    onClick={() => {
+      setEditProgram(null);
+      setModalOpen(true);
+    }}
+  >
+     Add New Program
+  </Button>
+</header>
+
 
       {/* Filter/Search */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">

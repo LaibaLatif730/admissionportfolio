@@ -40,14 +40,82 @@ import {
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 
+// ✅ JWT imports
+import jwt from "jsonwebtoken";
+
+// =======================
+// FASTAPI BASE URL
+// =======================
+const API_BASE = "http://127.0.0.1:8000/auth";
+
 export default function StudentPortalHomepage() {
+  // ===== STATE =====
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("applicant");
+  const [message, setMessage] = useState("");
+  const [jwtToken, setJwtToken] = useState<string | null>(null);
+
   const [appId, setAppId] = useState("");
   const [status, setStatus] = useState<string | null>(null);
-  const [role, setRole] = useState("applicant");
 
   const supabase = createClientComponentClient();
   const router = useRouter();
 
+  // ===== FUNCTIONS =====
+  // FastAPI Registration
+const handleRegister = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, role, verify_email: email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Registration failed");
+    setMessage("Registration successful! Please login.");
+    setAuthMode("login");
+  } catch (err: any) {
+    setMessage(err.message);
+  }
+};
+
+// FastAPI Login
+const handleLogin = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Login failed");
+
+    localStorage.setItem("jwt", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
+    setMessage("Login successful!");
+
+    // Redirect based on role
+    if (data.role === "admin") router.push("/admin/dashboard");
+    else if (data.role === "subadmin1") router.push("/subadmin1/dashboard");
+    else if (data.role === "subadmin2") router.push("/subadmin2/dashboard");
+    else router.push("/applicant/dashboard");
+  } catch (err: any) {
+    setMessage(err.message);
+  }
+};
+
+// Supabase OAuth Login
+const handleLoginSupabase = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin } // Optional redirect
+  });
+  if (error) console.error("Login Error:", error.message);
+};
+
+  // Admission Status Check
   const handleCheckStatus = async () => {
     if (!appId.trim()) return setStatus("Please enter an Application ID");
     setStatus("Checking...");
@@ -56,79 +124,53 @@ export default function StudentPortalHomepage() {
     }, 600);
   };
 
-  // ✅ Handle redirect after login
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        const userRole = session.user.user_metadata.role || "student";
-
-        if (userRole === "superadmin") {
-          router.push("/superadmin/dashboard");
-        } else if (userRole === "admin") {
-          router.push("/admin/dashboard");
-        }else if (userRole === "subadmin1") {
-          router.push("/subadmin1/dashboard");
-        }else if (userRole === "subadmin2") {
-          router.push("/subadmin2/dashboard");
-        }else {
-          router.push("/applicant/dashboard");
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase, router]);
-
-  // ✅ Login with Supabase (Google OAuth)
-  const handleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-    if (error) console.error("Login Error:", error.message);
-  };
-
+  // ===== RENDER =====
   return (
     <div className="min-h-screen bg-white text-gray-900">
+
       {/* NAVBAR */}
-      <nav className="sticky top-0 z-40 bg-whitebeacon /80 backdrop-blur border-b">
+      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Image
-              src="/images/logo.png"
-              alt="School Logo"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
+            <Image src="/images/logo.png" alt="School Logo" width={40} height={40} className="rounded-full" />
             <span className="font-bold text-lg">Beacon House School</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <a href="#programs" className="hover:text-indigo-600">
-              Programs
-            </a>
-            <a href="#roadmap" className="hover:text-indigo-600">
-              Journey
-            </a>
-            <a href="#portfolio" className="hover:text-indigo-600">
-              Success
-            </a>
-            <a href="#admission" className="hover:text-indigo-600">
-              Admissions
-            </a>
-            <a href="#events" className="hover:text-indigo-600">
-              Events
-            </a>
-
-            {/* ✅ Supabase Login */}
-            <Button size="sm" onClick={handleLogin}>
-              Sign In
-            </Button>
+            <a href="#programs" className="hover:text-indigo-600">Programs</a>
+            <a href="#roadmap" className="hover:text-indigo-600">Journey</a>
+            <a href="#portfolio" className="hover:text-indigo-600">Success</a>
+            <a href="#admission" className="hover:text-indigo-600">Admissions</a>
+            <a href="#events" className="hover:text-indigo-600">Events</a>
+            <Button size="sm" onClick={handleLoginSupabase}>Sign In</Button>
           </div>
         </div>
       </nav>
 
+      {/* AUTH FORM */}
+      <section className="max-w-md mx-auto mt-6 p-6 border rounded shadow">
+        <h2 className="text-xl font-bold mb-4">{authMode === "login" ? "Login" : "Register"}</h2>
+        <div className="flex justify-end mb-4 gap-2">
+          <Button size="sm" onClick={() => setAuthMode("login")} disabled={authMode === "login"}>Login</Button>
+          <Button size="sm" onClick={() => setAuthMode("register")} disabled={authMode === "register"}>Register</Button>
+        </div>
+        <div className="space-y-3">
+          <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+          <Input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+          {authMode === "register" && (
+            <Select value={role} onValueChange={val => setRole(val)}>
+              <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="applicant">Applicant</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          <Button onClick={authMode === "login" ? handleLogin : handleRegister} className="w-full">
+            {authMode === "login" ? "Login" : "Register"}
+          </Button>
+          {message && <p className="mt-2 text-sm font-medium text-red-600">{message}</p>}
+        </div>
+      </section>
       {/* HERO with IMAGE BACKGROUND */}
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-24 md:py-32">

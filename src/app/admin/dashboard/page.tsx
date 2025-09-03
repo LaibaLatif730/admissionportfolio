@@ -19,7 +19,16 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Users, GraduationCap, BookOpen, Bell, Settings, User, ChevronDown } from "lucide-react";
+import {
+  Users,
+  GraduationCap,
+  BookOpen,
+  Bell,
+  Settings,
+  User,
+  ChevronDown,
+  List,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -145,72 +154,118 @@ const data: Data = {
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
   const [timeframe, setTimeframe] = useState<"month" | "week" | "year">("month");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => setMounted(true), []);
   if (!mounted) {
     return (
       <div className="p-6 min-h-screen bg-gray-50 dark:bg-neutral-900">
-        <p className="text-center text-gray-500 dark:text-gray-400">Loading dashboard...</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">
+          Loading dashboard...
+        </p>
       </div>
     );
   }
 
-  // Card hover animation
   const cardHover = {
     whileHover: { scale: 1.03, boxShadow: "0 12px 24px rgba(0,0,0,0.12)" },
   };
 
-  // Button hover animation
   const buttonHover = {
     whileHover: { scale: 1.05, backgroundColor: "#f3f4f6" },
     whileTap: { scale: 0.95 },
   };
 
-  // Quick stat items
   const stats = [
-    { title: "Admissions", value: "120", subtitle: "+15%", icon: <GraduationCap className="text-blue-600" /> },
-    { title: "Portfolio Updates", value: "73", subtitle: "+8%", icon: <BookOpen className="text-emerald-600" /> },
-    { title: "Counseling Requests", value: "45", subtitle: "+22%", icon: <Users className="text-indigo-600" /> },
+    {
+      title: "Admissions",
+      value: "120",
+      subtitle: "+15%",
+      icon: <GraduationCap className="text-blue-600" />,
+    },
+    {
+      title: "Portfolio Updates",
+      value: "73",
+      subtitle: "+8%",
+      icon: <BookOpen className="text-emerald-600" />,
+    },
+    {
+      title: "Counseling Requests",
+      value: "45",
+      subtitle: "+22%",
+      icon: <Users className="text-indigo-600" />,
+    },
   ];
 
   return (
-    <motion.div
-      suppressHydrationWarning
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="p-6 bg-gray-50 dark:bg-neutral-900 min-h-screen"
-    >
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-10 rounded-xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md shadow-sm border px-6 py-3 mb-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-700 dark:text-blue-400">
-            Admin Dashboard
-          </h1>
-          <nav className="flex gap-4 text-sm font-medium">
-            <Link href="/admin/dashboard/users" className="hover:text-emerald-600 transition">
-              Users
-            </Link>
-            <Link href="/admin/dashboard/studentsList" className="hover:text-emerald-600 transition">
-              StudentsList
-            </Link>
-            <Link href="/admin/dashboard/programs" className="hover:text-emerald-600 transition">
-              Programs
-            </Link>
-            <Link href="/admin/dashboard/settings" className="hover:text-emerald-600 transition">
-              Settings
-            </Link>
-          </nav>
-        </div>
-      </header>
+   <motion.div
+  suppressHydrationWarning
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: 0.6 }}
+  className="flex bg-gray-50 dark:bg-neutral-900 min-h-screen"
+>
+  {/* SIDENAVBAR */}
+  {sidebarOpen && (
+    <aside className="w-45 h-150 bg-white dark:bg-neutral-800 rounded-xl shadow-md flex flex-col justify-between pt-6 pb-6 px-6 mt-6 ml-4">
+      {/* --- Top Section --- */}
+      <div>
+        <h2 className="text-lg font-bold text-blue-600 mb-6">Admin</h2>
+        <nav className="flex flex-col gap-3 text-sm">
+          <Link href="/admin/dashboard/users" className="hover:text-emerald-600 transition text-bold text-lg">
+            Users
+          </Link>
+          <Link href="/admin/dashboard/studentsList" className="hover:text-emerald-600 transition text-bold text-lg">
+            StudentsList
+          </Link>
+          <Link href="/admin/dashboard/programs" className="hover:text-emerald-600 transition text-bold text-lg">
+            Programs
+          </Link>
+          <Link href="/admin/dashboard/taskManagement" className="hover:text-emerald-600 transition text-bold text-lg">
+            Assign Task 
+          </Link>
+          <Link href="/admin/dashboard/settings" className="hover:text-emerald-600 transition text-bold text-lg">
+            Settings
+          </Link>
+        </nav>
+      </div>
 
+      {/* --- Bottom Section --- */}
+      <footer className="flex flex-col items-center mt-6">
+        {/* Decorative line */}
+        <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-orange-500/30 to-transparent rounded-full" />
+
+        {/* Small footer text */}
+        <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-2">
+          © 2025 Largify
+        </span>
+      </footer>
+    </aside>
+  )}
       {/* MAIN CONTENT */}
-      <div className="space-y-6">
+      <div className="flex-1 p-6 space-y-6">
+        <header className="rounded-xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md shadow-sm border px-6 py-3 mb-6 flex justify-between items-center">
+           {/* Left side: Toggle + Title */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              className="bg-blue-600 hover:bg-blue-800 text-white"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <List size={18} />
+            </Button>
+            <h1 className="text-xl font-bold text-blue-700 dark:text-blue-400">
+              Admin Dashboard
+            </h1>
+          </div>
+        </header>
+
         {/* SECTION HEADER */}
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-300">
-               Site Analytics
+              Site Analytics
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Track student engagement, admissions, and counseling performance.
@@ -224,14 +279,21 @@ export default function Dashboard() {
               <DropdownMenuTrigger asChild>
                 <motion.div {...buttonHover}>
                   <Button className="flex items-center gap-1 variant-outline size-sm  bg-blue-600 hover:bg-blue-800 text-white">
-                    {timeframe.charAt(0).toUpperCase() + timeframe.slice(1)} <ChevronDown size={16} />
+                    {timeframe.charAt(0).toUpperCase() + timeframe.slice(1)}{" "}
+                    <ChevronDown size={16} />
                   </Button>
                 </motion.div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="transition-all duration-300 ease-out">
-                <DropdownMenuItem onClick={() => setTimeframe("week")}>Week</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTimeframe("month")}>Month</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTimeframe("year")}>Year</DropdownMenuItem>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setTimeframe("week")}>
+                  Week
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeframe("month")}>
+                  Month
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeframe("year")}>
+                  Year
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -244,7 +306,7 @@ export default function Dashboard() {
                   </Button>
                 </motion.div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="transition-all duration-300 ease-out">
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem>No new notifications</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -258,7 +320,7 @@ export default function Dashboard() {
                   </Button>
                 </motion.div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="transition-all duration-300 ease-out">
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem>General</DropdownMenuItem>
                 <DropdownMenuItem>Security</DropdownMenuItem>
               </DropdownMenuContent>
@@ -273,7 +335,7 @@ export default function Dashboard() {
                   </Button>
                 </motion.div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="transition-all duration-300 ease-out">
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
@@ -302,9 +364,24 @@ export default function Dashboard() {
         {/* ANALYTICAL GRAPHS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { title: "Admissions Trend", type: "line", key: "admissions", color: "#6366F1" },
-            { title: "Portfolio Updates", type: "bar", key: "updates", color: "#6366F1" },
-            { title: "Counseling Requests", type: "line", key: "requests", color: "#6366F1" },
+            {
+              title: "Admissions Trend",
+              type: "line",
+              key: "admissions",
+              color: "#6366F1",
+            },
+            {
+              title: "Portfolio Updates",
+              type: "bar",
+              key: "updates",
+              color: "#6366F1",
+            },
+            {
+              title: "Counseling Requests",
+              type: "line",
+              key: "requests",
+              color: "#6366F1",
+            },
           ].map((chart, i) => (
             <motion.div key={i} {...cardHover}>
               <Card className="rounded-lg shadow-sm">
@@ -314,20 +391,33 @@ export default function Dashboard() {
                 <CardContent className="py-2">
                   <ResponsiveContainer width="100%" height={160}>
                     {chart.type === "line" ? (
-                      <LineChart data={data[timeframe][chart.key as keyof TimeFrameData]}>
+                      <LineChart
+                        data={data[timeframe][chart.key as keyof TimeFrameData]}
+                      >
                         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                         <XAxis dataKey="label" stroke="#6B7280" fontSize={10} />
                         <YAxis stroke="#6B7280" fontSize={10} />
                         <Tooltip />
-                        <Line type="monotone" dataKey="value" stroke={chart.color} strokeWidth={2} />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke={chart.color}
+                          strokeWidth={2}
+                        />
                       </LineChart>
                     ) : (
-                      <BarChart data={data[timeframe][chart.key as keyof TimeFrameData]}>
+                      <BarChart
+                        data={data[timeframe][chart.key as keyof TimeFrameData]}
+                      >
                         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                         <XAxis dataKey="label" stroke="#6B7280" fontSize={10} />
                         <YAxis stroke="#6B7280" fontSize={10} />
                         <Tooltip />
-                        <Bar dataKey="value" fill={chart.color} radius={[4, 4, 0, 0]} />
+                        <Bar
+                          dataKey="value"
+                          fill={chart.color}
+                          radius={[4, 4, 0, 0]}
+                        />
                       </BarChart>
                     )}
                   </ResponsiveContainer>

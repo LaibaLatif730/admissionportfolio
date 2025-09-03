@@ -17,8 +17,13 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold text-blue-600">Profile Settings</h1>
-
+      {/* Header */}
+            <header className="relative rounded-xl p-4 shadow-md overflow-hidden mb-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-blue-600/5 dark:from-blue-600/10 dark:to-blue-600/10 blur-xl" />
+        <div className="relative flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-blue-600">Profile Setting</h1>
+        </div>
+      </header>
       <Card>
         <CardHeader>
           <CardTitle className="text-xl text-blue-600">Login Details</CardTitle>

@@ -84,35 +84,35 @@ export default function StudentsPage() {
   return (
     <main className="p-8 space-y-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-blue-700 flex items-center gap-2">
-            Students List
-          </h1>
-          <p className="mt-1 text-gray-600 text-sm md:text-base">
-            Full record of all admitted students
-          </p>
-        </div>
+<header className="relative rounded-xl p-4 shadow-md overflow-hidden mb-6">
+  <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-blue-600/5 dark:from-blue-600/10 dark:to-blue-600/10 blur-xl" />
+  
+  <div className="relative flex justify-between items-center">
+    {/* Left side: Title */}
+    <h1 className="text-2xl font-bold text-blue-600">Student List</h1>
 
-        <div className="flex flex-wrap gap-2 items-center">
-          <Button className="bg-gray-400 text-gray-900 hover:bg-gray-500" onClick={exportCSV}>
-            Export CSV
-          </Button>
-          <Button className="bg-gray-400 text-gray-900 hover:bg-gray-500" onClick={() => setModalOpen(true)}>
-            Add New Student
-          </Button>
-          <input
-            type="text"
-            placeholder="Filter by name, email, program..."
-            value={filter}
-            onChange={(e) => {
-              setFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-      </header>
+    {/* Right side: Buttons + Search */}
+    <div className="flex flex-wrap gap-2 items-center">
+      <Button className="bg-gray-400 text-gray-900 hover:bg-gray-500" onClick={exportCSV}>
+        Export CSV
+      </Button>
+      <Button className="bg-gray-400 text-gray-900 hover:bg-gray-500" onClick={() => setModalOpen(true)}>
+        Add New Student
+      </Button>
+      <input
+        type="text"
+        placeholder="Filter by name, email, program..."
+        value={filter}
+        onChange={(e) => {
+          setFilter(e.target.value);
+          setCurrentPage(1);
+        }}
+        className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      />
+    </div>
+  </div>
+</header>
+
 
       {/* Student Table */}
       <section className="bg-white p-6 rounded-2xl shadow-md">

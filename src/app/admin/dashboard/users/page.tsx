@@ -127,11 +127,11 @@ const UsersPage: React.FC = () => {
   return (
     <div className="p-6 bg-white min-h-screen">
       {/* Header */}
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-navy-800">User Management</h1>
-        <p className="text-sky-700 mt-1">
-          Manage sub-admins, roles, domains, login credentials, and permissions.
-        </p>
+      <header className="relative rounded-xl p-4 shadow-md overflow-hidden mb-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-blue-600/5 dark:from-blue-600/10 dark:to-blue-600/10 blur-xl" />
+        <div className="relative flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-blue-600">User Management</h1>
+        </div>
       </header>
 
       {/* Controls */}
